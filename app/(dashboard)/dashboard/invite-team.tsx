@@ -12,7 +12,7 @@ import {
 import { Loader2, PlusCircle } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useActionState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { inviteTeamMember } from '@/app/(login)/actions';
 import { useUser } from '@/lib/auth';
 
@@ -24,10 +24,8 @@ type ActionState = {
 export function InviteTeamMember() {
   const { user } = useUser();
   const isOwner = user?.role === 'owner';
-  const [inviteState, inviteAction, isInvitePending] = useActionState<
-    ActionState,
-    FormData
-  >(inviteTeamMember, { error: '', success: '' });
+  const [state, formAction] = useFormState(inviteTeamMember, { error: '', success: '' } as ActionState);
+  const { pending } = useFormStatus();
 
   return (
     <Card>
@@ -35,7 +33,7 @@ export function InviteTeamMember() {
         <CardTitle>Invite Team Member</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={inviteAction} className="space-y-4">
+        <form action={formAction} className="space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
@@ -65,18 +63,18 @@ export function InviteTeamMember() {
               </div>
             </RadioGroup>
           </div>
-          {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
+          {state.error && (
+            <p className="text-red-500">{state.error}</p>
           )}
-          {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
+          {state.success && (
+            <p className="text-green-500">{state.success}</p>
           )}
           <Button
             type="submit"
             className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isInvitePending || !isOwner}
+            disabled={pending || !isOwner}
           >
-            {isInvitePending ? (
+            {pending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Inviting...

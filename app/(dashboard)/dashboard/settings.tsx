@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { customerPortalAction } from '@/lib/payments/actions';
-import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember } from '@/app/(login)/actions';
+import { useState, useCallback } from 'react';
+import { removeTeamMemberAction } from '@/app/(login)/actions';
 import { InviteTeamMember } from './invite-team';
+import { TeamDataWithMembers } from '@/lib/db/schema';
 
 type ActionState = {
   error?: string;
@@ -15,12 +15,14 @@ type ActionState = {
 };
 
 export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
-  const [removeState, removeAction, isRemovePending] = useActionState<
-    ActionState,
-    FormData
-  >(removeTeamMember, { error: '', success: '' });
+  const [removeState, setRemoveState] = useState<ActionState>({ error: '', success: '' });
+  
+  const removeAction = useCallback(async (formData: FormData) => {
+    const result = await removeTeamMemberAction(null, formData);
+    setRemoveState({ error: result.error || '', success: result.success || '' });
+  }, []);
 
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
+  const getUserDisplayName = (user: Pick<{ id: number | string; name?: string | null; email?: string }, 'id' | 'name' | 'email'>) => {
     return user.name || user.email || 'Unknown User';
   };
 
@@ -47,8 +49,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                 </p>
               </div>
               <form action={customerPortalAction}>
-                <Button type="submit" variant="outline">
-                  Manage Subscription
+                <Button type="submit">
+                  Gerenciar Assinatura
                 </Button>
               </form>
             </div>
@@ -90,11 +92,8 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                     <input type="hidden" name="memberId" value={member.id} />
                     <Button
                       type="submit"
-                      variant="outline"
-                      size="sm"
-                      disabled={isRemovePending}
                     >
-                      {isRemovePending ? 'Removing...' : 'Remove'}
+                      Remover
                     </Button>
                   </form>
                 ) : null}

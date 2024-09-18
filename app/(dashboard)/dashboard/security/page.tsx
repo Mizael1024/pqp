@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Lock, Trash2, Loader2 } from 'lucide-react';
-import { startTransition, useActionState } from 'react';
+import { startTransition } from 'react';
+import { useFormState } from 'react-dom';
 import { updatePassword, deleteAccount } from '@/app/(login)/actions';
 
 type ActionState = {
@@ -14,12 +15,12 @@ type ActionState = {
 };
 
 export default function SecurityPage() {
-  const [passwordState, passwordAction, isPasswordPending] = useActionState<
+  const [passwordState, passwordAction, isPasswordPending] = useFormState<
     ActionState,
     FormData
   >(updatePassword, { error: '', success: '' });
 
-  const [deleteState, deleteAction, isDeletePending] = useActionState<
+  const [deleteState, deleteAction, isDeletePending] = useFormState<
     ActionState,
     FormData
   >(deleteAccount, { error: '', success: '' });
@@ -28,13 +29,6 @@ export default function SecurityPage() {
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    // If you call the Server Action directly, it will automatically
-    // reset the form. We don't want that here, because we want to keep the
-    // client-side values in the inputs. So instead, we use an event handler
-    // which calls the action. You must wrap direct calls with startTranstion.
-    // When you use the `action` prop it automatically handles that for you.
-    // Another option here is to persist the values to local storage. I might
-    // explore alternative options.
     startTransition(() => {
       passwordAction(new FormData(event.currentTarget));
     });
@@ -52,16 +46,16 @@ export default function SecurityPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-medium bold text-gray-900 mb-6">
-        Security Settings
+        Configurações de Segurança
       </h1>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Password</CardTitle>
+          <CardTitle>Senha</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handlePasswordSubmit}>
             <div>
-              <Label htmlFor="current-password">Current Password</Label>
+              <Label htmlFor="current-password">Senha Atual</Label>
               <Input
                 id="current-password"
                 name="currentPassword"
@@ -73,7 +67,7 @@ export default function SecurityPage() {
               />
             </div>
             <div>
-              <Label htmlFor="new-password">New Password</Label>
+              <Label htmlFor="new-password">Nova Senha</Label>
               <Input
                 id="new-password"
                 name="newPassword"
@@ -85,7 +79,7 @@ export default function SecurityPage() {
               />
             </div>
             <div>
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
               <Input
                 id="confirm-password"
                 name="confirmPassword"
@@ -109,12 +103,12 @@ export default function SecurityPage() {
               {isPasswordPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
+                  Atualizando...
                 </>
               ) : (
                 <>
                   <Lock className="mr-2 h-4 w-4" />
-                  Update Password
+                  Atualizar Senha
                 </>
               )}
             </Button>
@@ -124,15 +118,15 @@ export default function SecurityPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Delete Account</CardTitle>
+          <CardTitle>Excluir Conta</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-500 mb-4">
-            Account deletion is non-reversable. Please proceed with caution.
+            A exclusão da conta é irreversível. Por favor, proceda com cuidado.
           </p>
           <form onSubmit={handleDeleteSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="delete-password">Confirm Password</Label>
+              <Label htmlFor="delete-password">Confirmar Senha</Label>
               <Input
                 id="delete-password"
                 name="password"
@@ -147,19 +141,18 @@ export default function SecurityPage() {
             )}
             <Button
               type="submit"
-              variant="destructive"
               className="bg-red-600 hover:bg-red-700"
               disabled={isDeletePending}
             >
               {isDeletePending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
+                  Excluindo...
                 </>
               ) : (
                 <>
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Account
+                  Excluir Conta
                 </>
               )}
             </Button>

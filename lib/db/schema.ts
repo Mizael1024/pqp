@@ -140,3 +140,13 @@ export enum ActivityType {
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
 }
+
+export const voices = pgTable('voices', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  voice_id: text('voice_id').notNull().unique(),
+  preview_url: text('preview_url'),
+  type: varchar('type', { length: 50 }).notNull(),
+  visibility: varchar('visibility', { length: 20 }).notNull().default('public'),
+  user_id: integer('user_id').references(() => users.id),
+});

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu } from 'lucide-react';
+import { Menu, Mic, Home } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -15,10 +15,8 @@ export default function DashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
-    { href: '/dashboard', icon: Users, label: 'Team' },
-    { href: '/dashboard/general', icon: Settings, label: 'General' },
-    { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
-    { href: '/dashboard/security', icon: Shield, label: 'Security' },
+    { href: '/dashboard', icon: Home, label: 'Home' },
+    { href: '/dashboard/tts', icon: Mic, label: 'Texto para Fala' },
   ];
 
   return (
@@ -26,7 +24,7 @@ export default function DashboardLayout({
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
         <div className="flex items-center">
-          <span className="font-medium">Settings</span>
+          <span className="font-medium">Dashboard</span>
         </div>
         <Button
           className="-mr-3"
@@ -51,9 +49,9 @@ export default function DashboardLayout({
             {navItems.map((item) => (
               <Link key={item.href} href={item.href} passHref>
                 <Button
-                  variant={pathname === item.href ? 'secondary' : 'ghost'}
+                  variant="ghost"
                   className={`my-1 w-full justify-start ${
-                    pathname === item.href ? 'bg-gray-100' : ''
+                    pathname === item.href ? 'bg-gray-100 hover:bg-gray-200' : 'hover:bg-gray-100'
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
